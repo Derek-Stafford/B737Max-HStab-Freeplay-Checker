@@ -1,12 +1,11 @@
 from tabulate import tabulate
 # Cosmetic
 bold = '\033[1m'
-#cyan = '\033[96m'
 end = '\033[0m'
-#gold = '\033[38;2;255;215;0m'
 green = '\033[92m'
 italic = '\033[3m'
 red = '\033[31m'
+yellow ='\033[38;5;226m'
 
 # Input Values
 D1 = float(input(italic+bold+"D1 = "))
@@ -15,28 +14,31 @@ D3 = float(input(italic+bold+"D3 = "))
 Weight = float(input(italic+bold+"Weight = "))
 
 # Conditons for if X, Y, or Z are negative
-def ensure_positive(value): 
+def negative_check(value): 
 	if value < 0:
 			return 0
 	else:
 			return value
 
 # Output Values and Threshold Messages
-def check_value(name, value, threshold):
+def individual_check(name, value, threshold):
  if value == 0:
-	 print(italic+bold+f"{name} = 0")
-	 print(italic+green+f"Double check the {name} value, otherwise {name} passes")
+	 return italic+bold+yellow+f"Re-Check {name}"+end
  elif value > threshold:
-		print(italic+red+f"{name} = {value:.4f}")
-		print(italic+red+f"{name} Failed")
+		return italic+bold+red+f"{name} Failed"+end
  else:
-			print(italic+green+f"{name} = {value:.4f}")
-			print(italic+green+f"{name} Passed")
+		return italic+bold+green+f"{name} Passed"+end
+
+def overall_check(name, value, threshold):
+	if value > threshold:
+			return italic+bold+red+f"{name} Failed"+end
+	else:
+			return italic+bold+green+f"{name} Passed"+end
 
 # Calculations
-X = ensure_positive(D1-(Weight * 0.0000155))
-Y = ensure_positive(D2-(Weight *  0.0000155))
-Z = ensure_positive((D3*1.25)- (Weight * 0.0000318))
+X = negative_check(D1-(Weight * 0.0000155))
+Y = negative_check(D2-(Weight *  0.0000155))
+Z = negative_check((D3*1.25)- (Weight * 0.0000318))
 H = Z+((X + Y)/2)
 equation = [
 	["X = (D1-(Weight*0.0000155))", X],
@@ -44,10 +46,14 @@ equation = [
 	["Z = (D3-(Weight*0.0000318))", Z],
 	["H = Z+((X+Y)/2)", H]
 ]
-head= ["Input", "Output"]
-print (tabulate(equation, headers =head, tablefmt="grid"))
+head_2= ["Formula", "Result"]
+print (tabulate(equation, headers =head_2, tablefmt="grid"))
 # Threshold Checks
-check_value("X",X,0.060)
-check_value("Y",Y,0.060)
-check_value("Z",Z, 0.050)
-check_value("H",H, 0.051)
+final = [
+ ["X", f"{X:.4f}", 0.060, individual_check("X",X,0.060)],
+ ["Y", f"{Y:.4f}", 0.060, individual_check("Y",Y,0.060)],
+ ["Z", f"{Z:.4f}", 0.050, individual_check("Z", Z, 0.050)],
+ ["H", f"{H:.4f}",0.051,  overall_check("H", H, 0.051)]
+]
+head_3 = ["Var.", "Output","Limit", "Result"]
+print(tabulate(final, headers = head_3, tablefmt = "grid"))
